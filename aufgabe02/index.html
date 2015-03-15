@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Realtime Rendering - Abgaben</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+
+<style type="text/css">
+  html,
+  body {
+    height: 100%;
+  }
+
+  #wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto .60px;
+  }
+  #push,
+  #footer {
+    height: 60px;
+  }
+  #footer {
+    background-color: #f5f5f5;
+  }
+</style>
+</head>
+<body onload="webGLStart();">
+<script type="text/javascript" src="./js/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="./js/webgl-utils.js"></script>
+<script type="text/javascript" src="./js/sphere.js"></script>
+<script src="./js/jquery.js"></script>
+<script src="./js/bootstrap.js"></script>
+<script type="text/javascript" src="./js/scene.js"></script>
+<div id="wrap">
+<div class="container">
+
+<div class="page-header">
+  <h1>Realtime Rendering<br> <small>Abgaben SS 2013</small>
+  </h1>
+</div>
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="./../index.html">Aufgaben</a>
+    <ul class="nav">
+     <li class="active"><a href="./../aufgabe02/index.html">WebGL Tesselation</a></li>
+      <li><a href="./../aufgabe03/index.html">Simple Lighting</a></li>
+      <li><a href="./../aufgabe04/index.html">Environment-Mapping</a></li>
+    </ul>
+  </div>
+</div>
+
+
+<div class="hero-unit"> 
+    <div id="canvas-container">
+      <p><canvas id="canvas" width="820" height="492"></canvas></p>
+    </div>  
+
+    <h3>L&ouml;sung der Aufgabe 2.1</h3>
+    Der hier eigebundene WebGL Canvas basiert auf dem Code des WebGL Tutorials <a href="http://learningwebgl.com/">lerningwebgl.com</a>.</br>
+    Um eine Sph&auml;re durch Tesslation zu erzeugen, wurde in mehreren Schritten vorgegangen.</br>
+    Als Erstes wurden die Funktionen und Variablen die der Erzeugung der Pyramide dienten</br>
+    aus der Index.html in eine eigenst&auml;ndige Java Script Datei <a href="./js/sphere.js"> Sphere.js</a>
+    ausgelagert.</br>
+    Gem&auml;&szlig; der Aufgabenstellung enth&auml;lt die Sphere.js eine Konstruktor-Funktion die durch die Rekursionstiefe Parameterisiert wird.</br>
+    Innerhalb der Sphere Funktion wird eine Draw Funktion als Instanz Funktion definiert, welche alle Befehle enth&auml;lt um die Vertex Daten der Array Buffer mit der Funktion <b><i>gl.drawArrays</i></b> zu zeichnen.
+    </br>Desweiteren wurde eine initialize Buffers Funktion definiert welche die Buffer binden und f&uuml;llen kann sobald die gl Variable global initialisiert wurde.
+    Um eine bessere &Uuml;bersicht zu erreichen haben wir zu Letzt die restlichen JavaScript Funktionen welche die Szene erzeugen und animieren in die Skript Datei <a href="./js/scene.js">Scene.js</a> ausgelagert.  
+    <h3>L&ouml;sung der Aufgabe 2.2</h3>
+    Die Farben der Vertices basieren ergeben sich aus den durch die Tesslation erzeugten Vertices.</br>
+    Die X,Y,Z Koordinaten werden dabei als RGB Werte verwendet.
+    Negative Vektoren werden mit -1.0 multipliziert um sie in das Intervall [0,1] zu transformieren.</br>
+    Durch die Normalisierung der Vektoren w&auml;hrend der Tesslation ist bereits sichergestellt das die Vektoren inner halb des Intervalls [-1.0,1.0] befinden.
+    <h3>Steuerung</h3>
+    Die Kamera kann durch die folgenden Tasten in die folgenden Richtungen bewegt werden.</br>
+    W - Oben</br>
+    A - Links</br>
+    S - Unten</br>
+    D - Rechts</br>
+    Q - Zoom herein</br>
+    E - Zoom heraus</br>
+    1 - Zeichenmodus LINELOOP</br>
+    2 - Zeichenmodus TRIANGLES</br>
+    + - Rotationsgeschwindigkeit erhoehen</br>
+    - - Rotationsgeschwindigkeit reduzieren</br>
+    <h4>Source Code</h4> 
+    <ul>
+    <li><a href="https://code.google.com/p/rtr2013/source/browse/#svn%2Ftrunk%2Faufgabe02">RTR2013 Projekt Sources auf Google Code</a>
+    </li></ul>
+    <h4>Quellen</h4>
+    <ul>
+      <li><a href="http://www.glprogramming.com/red/chapter02.html">Open GL Redbook Chapter 2</a></li>
+      <li><a href="http://learningwebgl.com/blog/?p=370">Learning WebGL Lesson 4</a></li>
+    </ul></div>
+
+</div>
+
+<div id="push"></div>
+</div>
+
+ <div id="footer">
+   <div class="container">
+	 <p class="muted credit">Website made by<br/>
+	   Fabian Engels s797352
+	   <a href="mailto:engels.fabian@gmail.com">engels.fabian@gmail.com</a><br>
+	   Sven H&ouml;che s797948
+	   <a href="mailto:sven.hoeche@gmx.de">sven.hoeche@gmx.de
+    </p>
+      </div>
+  </div>
+
+  <script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+
+</body></html>

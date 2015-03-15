@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Realtime Rendering - Abgaben</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../css/shCore.css">
+    <link rel="stylesheet" type="text/css" href="../css/shThemeDefault.css">
+    
+    <script type="text/javascript" src="../tdl/tdl/base.js"></script>
+    <script type="text/javascript" src="../js/jquery-2.0.2.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+
+    <script type="text/javascript" src="./js/scene.js"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <!-- jquery slider scripts to modify the blur uniforms, on slider change anonymus function is executed  -->
+    <script>
+      $(function() {
+        $( "#slider" ).slider({
+          animate: "fast", max: 1200.0, min: 1.0, step: 1.0,value: 600.0,
+          change: function( event, ui ) {
+            g_velocityScale = ui.value/10.0;
+            $('#sliderlabel').text("velocityScale " + ui.value/10.0);
+          }
+        });
+      });
+
+      $(function() {
+        $( "#eyespeedslider" ).slider({
+          animate: "fast", max: 50.0, min: -50.0, step: 0.1,
+          change: function( event, ui ) {
+            g_eyeSpeed = ui.value;
+            $('#eyespeedsliderlabel').text("eyespeed " + ui.value);
+          }
+        });
+      });
+
+      $(function() {
+        $( "#samplesslider" ).slider({
+          animate: "fast", max: 50.0, min: 1.0, step: 1.0,value: 14.0, 
+          change: function( event, ui ) {
+            g_samples = ui.value;
+            $('#samplessliderlabel').text("samples " + ui.value);
+          }
+        });
+      });
+    </script>
+</head>
+<body>
+<style type="text/css">
+#viewContainer {
+  width: 100%;
+  height: 100%;
+}
+  #wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto .60px;
+  }
+  #push,
+  #footer {
+    height: 60px;
+  }
+  #footer {
+    background-color: #f5f5f5;
+  }
+</style>
+
+<div id="wrap">
+<div class="container">
+<div class="page-header">
+  <h1>Realtime Rendering<br> <small>Abgaben SS 2013</small>
+  </h1>
+</div>
+
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="./../index.html">Aufgaben</a>
+    <ul class="nav">
+      <li><a href="./../aufgabe02/index.html">WebGL Tesselation</a></li>
+      <li><a href="./../aufgabe03/index.html">Simple Lighting</a></li>
+      <li><a href="./../aufgabe04/index.html">Environment-Mapping</a></li>
+      <li class="active"><a href="./../aufgabe05/index.html">Multipass Rendering</a></li>
+    </ul>
+  </div>
+</div>
+
+ <div class="hero-unit"> 
+  <h3>Motion Blur als Post Processing Effekt</h3>
+    <div class="fpsContainer">
+      <div class="fps">fps: <span id="fps">
+      </div>
+    </div>
+    <div id="canvas-container">  
+      <p><canvas id="canvas" width="800" height="600"></canvas></p>
+    </div> 
+ 
+<div id="sliderlabel">velocityScale</div><div id="slider"></div>
+<div id="eyespeedsliderlabel">eyespeed</div><div id="eyespeedslider"></div>
+<div id="samplessliderlabel">samples</div><div id="samplesslider"></div>
+</div>
+<h3>Aufgabe 5 Multipass Rendering</h3>
+Sources:
+<ul>
+<li><a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe05/">Google Code RTR 2013 Aufgabe 5</a></li>
+<li><a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe05/index.html">index.html</a></li>
+<li><a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe05/js/scene.js">scene.js</a></li>
+<li><a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe05/shaders/main.fs">main.fs</a></li>
+<li><a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe05/shaders/main.vs">main.vs</a></li>
+</ul>
+Pr&auml;sentation:
+<a href="./pdf/RTR_Motion_Blur.pdf">RTR Motion Blur Pr&auml;sentation</a>
+
+<h3>Erl&auml;uterung der hier angewandten Methode</h3>
+<h4>Vorwort</h4>Die oben dargestellte Szene basiert auf dem Code des TDL Examples welches <a href="https://github.com/greggman/tdl/blob/master/example/example.html">hier auf GitHub</a> zu finden ist.
+<br/>
+Um die Shader Programme aus externen Dateien laden zu k&ouml;nnen haben wir die
+Funktion createProgramFromTags ge&auml;ndert, sodass &uuml;ber JQuery HTTP Requests geladen werden. Durch das HTML Encoding werden die Zeichen Ampersandt & und < > richig im Source Code dargestellt.
+<pre class="brush: js">
+// Function to load shader programs as files by uri.
+// JQuery HttpRequest
+function createProgramFromTags(vertexTagId, fragmentTagId) {
+// http://stackoverflow.com/questions/4878145/javascript-and-webgl-external-scripts
+    var vs_source = null,
+        fs_source = null;
+  $.ajax({
+      async: false,
+      url: vertexTagId,
+      success: function (data) {
+        vs_source = data;
+      },
+      dataType: 'html' // HTML for the correct encoding of ampersand so.
+  });
+
+  $.ajax({
+      async: false,
+      url: fragmentTagId,
+      success: function (data) {
+        fs_source = data;
+      },
+      dataType: 'html'
+  });
+  return tdl.programs.loadProgram(vs_source, fs_source);
+}
+</pre>
+
+
+<h4>Kurzbeschreibung des hier implementierten Verfahrens</h4>
+Das von uns gew&auml;hlte Verfahren (siehe unten Ressourcen GPU Gems 3) bildet Motion Blur nach, indem wir unsere Szene zun&auml;chst in eine Textur rendern.
+Die aktuelle und vorherige Kameratransformation Matrix zusammen mit den Tiefeninformationen des ger&auml;nderten Bildes wird dann genutzt, um die vorigen Positionen der Fragmente innerhalb der Szene zu berechnen.<br/>
+Wenn wir die aktuelle Fragmentposition haben und die Position des Fragments innerhalb des letzten Frames, dann k&ouml;nnen wir einen Richtungsvektor zwischen diesen beiden Fragmentpositionen berechnen.
+Diesen Vektor k&ouml;nnen wir dann skalieren und mehrmals auf unsere aktuelle Textur Koordinate anwenden(sampeln).<br/>
+Dieses Verfahren hat den Nachteil, dass Motion Blur nur abh&auml;ngig von der Kameratransformation angewandt wird. Bewegt sich ein Objekt durch die Szene w&auml;hrend die Kamera sich nicht bewegt, so wird das Objekt nicht weich gezeichnet.
+
+<br/>
+
+<h4>Schritt 1</h4>
+Wir rendern unsere urspr&uuml;ngliche Szene nicht in den Framebuffer bzw. Backbuffer, sondern in ein extra Angelegtes Framebuffer Objekt.<br/>
+Dazu erzeugen wir uns w&auml;hrend der Initialisierung ein Framebuffer Objekt mit der Hilfe der TDL-Bibliothek und binden es als Aktuelles Render Target ein, bevor wir innerhalb der render() Funktion zeichnen.
+<pre class="brush: js">
+function initialize(){
+  // see tdl/framebuffers.js takes width, height and opt_depth as parameter
+  lastFbo = tdl.framebuffers.createFramebuffer(canvas.width, canvas.height, true);
+  ...
+  function render() {
+    ...
+    lastFbo.bind();
+    ...
+  }
+}
+</pre>
+
+<h4>Schritt 2</h4>
+Nach dem wir bereits zuvor unsere Szene gezeichnet haben, nutzen wir nun die beiden Framebuffer Komponenten: Texture und depthTexture des Framebuffer Objekts als Input f&uuml;r unseren Motion Blur Shader. Dazu definieren wir im Rahmen der Initialisierung ein Model welches als Texture Plane, f&uuml;r unsere Szenen Texture aus Schritt 1 dienen soll.<br/>
+Die Camera unserer Szene ist dabei direkt auf eine Seitenfl&auml;che des Cubes gerichtet, sodass der gesammte Bildschirm gef&uuml;llt wird.
+<br/> 
+
+<pre class="brush: js">
+/**
+ * Sets up cube which takes textures and applies post processing. 
+ */
+function setupTextureCube(texture, depthTexture) {
+  var textures = {
+      texture: texture,
+      depthTexture: depthTexture
+  };
+  var program = createProgramFromTags(
+    './shaders/main.vs',
+    './shaders/main.fs');
+  var arrays = tdl.primitives.createCube(2);
+  delete arrays.normal;
+  return new tdl.models.Model(program, arrays, textures);
+}
+</pre>
+
+
+<h4>Schritt 3</h4>
+Wir haben also eine Plane f&uuml;r unsere Texture nun wollen wir den Post Processing Effekt anwenden.<br/>
+Der folgende Code Abschnitt zeigt, dass wir von unserem Framebuffer Objekt die Texture als auch die depthTexture an unsere Shader Programme als Texturen binden.
+F&uuml;r unseren Shader Effekt ben&ouml;tigen wir aber weitere Informationen als nur die Informationen des bereits berechneten Bildes.
+An die Shader binden wir daher als Uniform in jedem Draw Aufruf g_velocityScale, g_samples um den Motion Blur Effekt dynamisch steuern zu k&ouml;nnen.<br/>
+Konstant w&auml;hrend eines Rendervorganges sind hingegen die Bestandteile der Blur Konstanten welche in der Kurzbeschreibung des Motion Blur Verhahrens erw&auml;nt wurden.
+
+
+<pre class="brush: js">
+function initialize(){
+  ...
+  // Create the cube as plane for our texture, no scaling or rotation is futher needed.
+  var textureCube = setupTextureCube(lastFbo.texture, lastFbo.depthTexture);
+  ...
+  var previousViewProjection = new Float32Array(16);
+  var viewProjectionInverse = new Float32Array(16);
+  ...
+  var blurConst = {
+      viewProjection: viewProjection,
+      viewProjectionInverse: viewProjectionInverse,
+      previousViewProjection: previousViewProjection};
+  function render() {
+    // stop write to framebuffer object, indirect switch to backbuffer as render target
+    lastFbo.unbind();
+    ...
+    textureCube.drawPrep(blurConst);
+    textureCube.draw({velocityScale: g_velocityScale, samples: g_samples});
+    ...
+    // Now we are done and store our current matrix as previous for the shader in the next render() call.
+    fast.matrix4.copy(previousViewProjection, viewProjection);
+  }
+}
+</pre>
+
+<h4>Motion Blur Shader</h4>
+Der Motion Blur Effekt wird bei uns vollst&auml;ndig innerhalb des Fragment Shaders berechnet.<br/>
+Der Vertex Shader leitet die Vertex informationen direkt weiter allerdings spiegeln wir die Y-Achse da unsere Textur sonst auf dem Kopf steht.<br/>
+
+<pre class="brush: js">
+ttribute vec2 position;
+attribute vec2 texCoord;
+
+uniform mat4 viewProjectionInverse;
+uniform mat4 previousViewProjection;
+
+varying vec2 v_texCoord;
+
+void main() {
+  gl_Position = vec4(position, 0, 1);
+  // Y-Flip the plane so texture orientation is okay.
+  gl_Position.y *= -1.0; 
+  v_texCoord = texCoord;
+ 
+}
+</pre>
+
+Hier am Anfang des Fragment Shaders finden wir unsere Uniform variablen aus Schritt 3 wieder.<br/>
+Die einzige Variable die wir aus dem Vertex Shader beziehen ist die Textur Koordinate.
+
+<pre class="brush: js">
+precision mediump float;
+
+uniform sampler2D texture;
+uniform sampler2D depthTexture;
+
+uniform mat4 previousViewProjection;
+uniform mat4 viewProjectionInverse;
+uniform float velocityScale;
+uniform float samples;
+
+varying vec2 v_texCoord;
+</pre>
+
+Wie bereits in der Kurzbeschreibung ganz am Anfang erkl&auml;rt m&ouml;chten wir als erstes die Tiefeninformation f&uuml;r unsere derzeitige Texture Koordinate wissen.
+Dann erzeugen wir uns einen Vektor der im Viewport-Koordinatensystem liegt. Dabei k&ouml;nnen X und Y &uuml;bernommen werden da die Textur ja unseren kompletten Canvas/Bildschirm einnimmt. Ein Pixel in der Texture entspricht dabei einem Pixel auf dem Bildschirm. Jedoch m&uuml;ssen wir die Koordinaten in das Viewportkoordinaten System transformieren um mit der Inversen Matrix in das Weltkoordinatensystem zur&uuml;ck kehren zu k&ouml;nnen.
+
+<pre class="brush: js">
+// http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
+// http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
+// http://www.phasersonkill.com/?p=585
+void main() {
+  // Get the depth buffer value at this pixel.
+
+  float zOverW = texture2D(depthTexture, v_texCoord).z;
+
+  // H is the viewport position at this pixel in the range -1 to 1.
+  vec4 H = vec4((v_texCoord.x * 2.0) - 1.0, (v_texCoord.y * 2.0) - 1.0, zOverW, 1.0);
+
+  // Transform by the view projection inverse.
+  vec4 D = H * viewProjectionInverse;
+
+  // Divide by w to get the world position.
+  vec4 worldPos = D / D.w;
+</pre>
+
+Nach dem wir die aktuelle Koordinate im Weltkoordinatensystem haben m&ouml;chten wir die Position innerhalb des vorherigen Frames umd die Differenz bestimmen zu k&ouml;nnen. Die aktuelle Position wird daher mit der vorherigen ViewProjectionMatrix multipliziert(Kamerasystem) und anschlie&szlig;end durch W geteilt um das ViewPort Koordinatensystem zu erreichen. Im letzten Schritt berechnen wir den Differenzvektor im 2D System und skalieren ihn.
+
+<pre class="brush: js">
+  // GPU Gems 3 Example 27-2. Adaptation
+
+  // Current viewport position
+  vec4 currentPos = H;
+
+  // Use the world position, and transform by the previous viewprojecton matrix.
+  vec4 previousPos = worldPos * previousViewProjection;
+
+  // Convert to nonhomogeneous points [-1,1] by dividing by w.
+  previousPos /= previousPos.w;
+
+  // Use this fram's position and last frames to compute the pixel velocity.
+  vec2 velocity = ((currentPos - previousPos) / velocityScale).xy;
+</pre>
+
+Im letzten Abschnitt des Fragmentshaders verschieben wir die Texturkoordinate in Richtung der Beschleunigung, summieren die Farben auf und Mitteln sie dies gibt uns dann die unscharfe Farbe f&uuml;r den aktuellen Frame.
+
+<pre class="brush: js">
+  // GPU Gems 3 Example 27.3 Adaptation
+
+  // Get the inital color at this pixel.
+  vec4 color = texture2D(texture, v_texCoord);
+  
+  vec2 texCoord = v_texCoord + velocity;
+  
+  for(int i = 1; i < 21; ++i) {
+    if(i >= int(samples))
+      break;
+    texCoord += velocity;
+    // Add the current color to our color sum.  
+    color += texture2D(texture, texCoord);
+  }
+
+  // Average all of the samples to get the final blur color.  
+  gl_FragColor = color / samples; 
+}
+</pre>
+
+<h4>Fazit</h4>
+Diese Art der Motion Blur implementierung ist sehr kompakt und kann als zus&auml;tzliche Stufe an beliebe Szenen angehangen werden, jedoch wie bereits am Anfang erw&auml;hnt wird die gesammte Szene &uuml;ber die Kamerabewegung weich gezeichnet.</br>
+Anhand unserer Szene kann man auch beobachten das diese Implementierung mit der Velocity Skalierung stark von den FPS abh&auml;ngt, um diesen Effekt auszugleichen k&ouml;nnten wir die Velocity Skalierung durch die FPS regulieren.
+
+<h3>Ressourcen</h3>
+<ul>
+<li><a href="./pdf/RTR_Motion_Blur.pdf">NVIDIA GPU Gems 3 Chapter 27. Motion Blur as a Postprocessing Effekt</a></li>
+<li><a href="https://www.khronos.org/registry/webgl/specs/latest/">WebGL latest Spec</a></li>
+  </ul>
+</div>
+<div id="push"></div>
+</div>
+
+ <div id="footer">
+   <div class="container">
+	<p class="muted credit">Website made by<br/>
+	Fabian Engels s797352
+	<a href="mailto:engels.fabian@gmail.com">engels.fabian@gmail.com</a><br>
+	Sven H&ouml;che s797948
+	<a href="mailto:sven.hoeche@gmx.de">sven.hoeche@gmx.de</p>
+  </div>
+  </div>
+<script type="text/javascript">
+     SyntaxHighlighter.all()
+</script>
+</body></html>

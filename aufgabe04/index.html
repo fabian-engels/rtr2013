@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Realtime Rendering - Abgaben</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+
+<style type="text/css">
+  html,
+  body {
+    height: 100%;
+  }
+
+  #wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto .60px;
+  }
+  #push,
+  #footer {
+    height: 60px;
+  }
+  #footer {
+    background-color: #f5f5f5;
+  }
+</style>
+</head>
+<body onload="webGLStart();">
+<script type="text/javascript" src="tdl/base.js"></script>
+<script type="text/javascript" src="tdl/gl-matrix.js"></script>
+<script type="text/javascript" src="tdl/lit.js"></script>
+<div id="wrap">
+<div class="container">
+<div class="page-header">
+  <h1>Realtime Rendering<br> <small>Abgaben SS 2013</small>
+  </h1>
+</div>
+
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="./../index.html">Aufgaben</a>
+    <ul class="nav">
+      <li><a href="./../aufgabe02/index.html">WebGL Tesselation</a></li>
+      <li><a href="./../aufgabe03/index.html">Simple Lighting</a></li>
+      <li class="active"><a href="./../aufgabe04/index.html">Environment-Mapping</a></li>
+    </ul>
+  </div>
+</div>
+
+ <div class="hero-unit"> 
+    <div id="canvas-container">
+      <p><canvas id="canvas" width="1170" height="702"></canvas></p>
+    </div>
+    <a href="https://code.google.com/p/rtr2013/source/browse/#svn%2Ftrunk%2Faufgabe04">Source Code der Aufgabe04 auf code.google.com</a>
+    <a href="https://code.google.com/p/rtr2013/source/browse/trunk/aufgabe04/tdl/lit.js">lit.js</a>
+    <a href="./index.html">index.html</a>  
+  <ul>
+      <li>Use keys 0-5 to switch between shader programs.</li>
+	  <li>Press 'R' to rotate the tori.</li>
+	  <li>Press 'C' to switch the 1st ligh color.</li>
+	  <li>Press 'X' to switch the 2nd light color.</li>
+	  <li>Press 'T' to toggle the 2nd light animation.</li>
+	  <li>Press 'I' to increase the 1st light intensity.</li>
+	  <li>Press 'O' to decrease the 1st light intensity.</li>
+	  <li>Press 'K' to increase the 2nd light intensity.</li>
+	  <li>Press 'L' to decrease the 2nd light intensity.</li>
+	  <li>Press 'Q' to switch the geometry between cubes and tori.</li>
+	  <li>Press 'W' to move eyeposition forward.</li>
+	  <li>Press 'A' to move eyeposition left.</li>
+	  <li>Press 'D' to move eyeposition right.</li>
+	  <li>Press 'S' to move eyeposition backwards.</li>
+	  <li>Press 'Z' to increase the texture color.</li>
+	  <li>Press 'H' to decrease the texture color.</li>
+    </ul>
+</div>
+<h3>Aufgabe 4.1: Cube-Mapping</h3>
+In der Computer Grafik bezeichnet Cube-Mapping ein Verfahren bei dem die Umgebung einer Szene, als Textur auf die 6 Seiten eines W&uuml;rfels, abgebildet wird.<br/>
+Dieser W&uuml;rfel wird unter OpenGL samplerCube genannt kann dann genutzt um Objekte mit Umgebungstexturen zu gestallten um Effekte zu erzielen wie zum Beispiel: Umgebungsreflektion oder zur Erzeugung einer Skybox.<br/>
+
+
+Die folgenden Schritte wurden unter WebGL angewandt um den Effekt der Umgebungsreflektion zu erzeugen.
+Um uns das Leben zu erleichtern benutzten wir die ThreeD Library die <a href="https://github.com/greggman/tdl">hier auf Github</a> zu finden ist.
+Diese Library kapselt Low-Level funktionen und sollte nicht mit der Three.js Library <a href="https://github.com/mrdoob/three.js/">hier auf Github</a> verwechselt werden.
+<ul><li></li></ul>
+
+ als eine Gruppe von Texturen vorliegt die auf die 6 Seiten eines W&uuml;rfels projeziert werden.<br/>
+
+Wenn der Betrachter der Szene sich in der Mitte des so erzeugten Würfels befindet entsteht der Eindruck sich inner halb der projezierten Umgebung zu befinden.<br/>
+
+Als Teil dieser Aufgabe sollte kubisches Reflection-Mapping implementiert werden, das heißt die wie oben beschriebene Umgebung soll von Objekten in der Szene reflektiert werden.<br/>
+
+Um dies zu erreichen ist es einfacher sich ersteinmal mit dem Aufgabenteil 2 zu beschäftigen und eine Skybox zu erzeugen.
+Der Shader welcher für die Skybox angewendet wird unterscheidet sich nur minimal vom Shader welcher die Umgebungsreflektion erzeugt.
+
+gl.FragColor = textureCube(samplerCube, normalize(eyePositionW));
+
+<h3>Aufgabe 4.2</h3>
+
+
+<h3>Ressourcen</h3>
+<ul>
+  <li>
+    <a href="http://www.opengl.org/wiki/Main_Page">http://www.opengl.org/wiki/Main_Page</a>
+  </li><li>
+    How to load textures to create a samplerCube for textureCube TDL<br/>
+    <a href="https://threedlibrary.googlecode.com/hg-history/5fb08ceb6393baf4d36111edabcf6c4c141e8a3b/docs/index.html"/>
+    https://threedlibrary.googlecode.com/hg-history/5fb08ceb6393baf4d36111edabcf6c4c141e8a3b/docs/index.html</a>
+  </li><li>
+  The OpenGL Shading Language<br/>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.30.6.pdf">http://www.opengl.org/registry/doc/GLSLangSpec.4.30.6.pdf</a>
+</li><li>
+<a href="http://research.ncl.ac.uk/game/mastersdegree/graphicsforgames/cubemapping/Tutorial%2013%20-%20Cube%20Mapping.pdf">
+http://research.ncl.ac.uk/game/mastersdegree/graphicsforgames/cubemapping/Tutorial%2013%20-%20Cube%20Mapping.pdf</a>
+</li><li>
+WebGL Specification v1.0<br/>
+<a href="https://www.khronos.org/registry/webgl/specs/1.0/">https://www.khronos.org/registry/webgl/specs/1.0/<a/>
+</li><li>
+<a href="http://www.nihilogic.dk/labs/webgl_cheat_sheet/WebGL_Cheat_Sheet.htm">http://www.nihilogic.dk/labs/webgl_cheat_sheet/WebGL_Cheat_Sheet.htm</a>
+</li>
+<a href="http://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf">http://www.khronos.org/files/webgl/webgl-reference-card-1_0.pdf</a>
+</li><li>
+How to use the pointer lock API<br/>
+<a href="https://developer.mozilla.org/en-US/docs/WebAPI/Pointer_Lock">https://developer.mozilla.org/en-US/docs/WebAPI/Pointer_Lock</a>
+</li><li>
+Interesting Stuff 
+<a href="http://www.nvidia.com/object/cube_map_ogl_tutorial.html">http://www.nvidia.com/object/cube_map_ogl_tutorial.html</a>
+</li><li>
+Set gl.UNPACK_FLIP_Y_WEBGL<br/>
+<a href="http://www.khronos.org/opengles/sdk/1.1/docs/man/glPixelStorei.xml">http://www.khronos.org/opengles/sdk/1.1/docs/man/glPixelStorei.xml</a>
+</li><li>
+<a href="http://html5readiness.com/">http://html5readiness.com/</a>
+</li><li>
+<a href="http://www.html5rocks.com/en/tutorials/pointerlock/intro/">http://www.html5rocks.com/en/tutorials/pointerlock/intro/</a>
+</li><li>
+<a href="https://developer.mozilla.org/en-US/docs/Web/Tutorials">https://developer.mozilla.org/en-US/docs/Web/Tutorials</a>
+</li><li>
+<a href="http://voxelent.com/html/beginners-guide/1727_10/ch10_NormalMap.html">http://voxelent.com/html/beginners-guide/1727_10/ch10_NormalMap.html</a>
+</li>
+</ul>
+</div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+</div>
+<div id="push"></div>
+</div>
+
+ <div id="footer">
+   <div class="container">
+	<p class="muted credit">Website made by<br/>
+	Fabian Engels s797352
+	<a href="mailto:engels.fabian@gmail.com">engels.fabian@gmail.com</a><br>
+	Sven H&ouml;che s797948
+	<a href="mailto:sven.hoeche@gmx.de">sven.hoeche@gmx.de</p>
+  </div>
+  </div>
+
+  <script id="vs0" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+attribute vec4 position;
+
+void main() {
+  gl_Position = projection * view * model * position;
+}
+</script>
+
+<script id="fs0" type="text/glsl">
+precision highp float;
+
+uniform vec3 color;
+
+void main() {
+  gl_FragColor.rgb = 0.7 * color;
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Lambert lighting model, Gouraud shading -->
+
+<script id="vs1" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 color;
+uniform vec3 lightIntensity;
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 intensity;
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 intensity, vec3 reflectivity) {
+  return 0.1 * reflectivity * intensity +
+         0.6 * reflectivity * intensity * max(0.0, dot(normal, light));
+}
+
+void main() {
+  vec3 normalW = (model * vec4(normal, 0.0)).xyz;
+  vec4 positionW = model * position;
+  vec3 lightDirectionW = normalize(lightPosition - positionW.xyz);
+
+  intensity = lambert(normalW, lightDirectionW, lightIntensity, color);
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs1" type="text/glsl">
+precision highp float;
+
+varying vec3 intensity;
+
+void main() {
+  gl_FragColor.rgb = intensity;
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Phong lighting model, Gouraud shading -->
+
+<script id="vs2" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 color;
+uniform vec3 lightIntensity;
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 intensity;
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 intensity, vec3 reflectivity) {
+  return 0.1 * reflectivity * intensity +
+         0.6 * reflectivity * intensity * 
+         max(0.0, dot(normal, light));
+}
+
+vec3 phong(vec3 normal, vec3 eye, vec3 light, 
+           vec3 intensity, vec3 reflectivity) {
+  return lambert(normal, light, intensity, reflectivity) +
+         0.3 * intensity * pow(max(0.0, dot(reflect(-eye, normal), 
+                                      light)), 10.0);
+}
+
+void main() {
+  vec3 normalW = (model * vec4(normal, 0.0)).xyz;
+  vec4 positionW = model * position;
+  vec3 lightDirectionW = normalize(lightPosition - positionW.xyz);
+  vec3 eyeDirectionW = normalize(eyePosition - positionW.xyz);
+
+  intensity = phong(normalW, eyeDirectionW, lightDirectionW, 
+                    lightIntensity, color);
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs2" type="text/glsl">
+precision highp float;
+
+varying vec3 intensity;
+
+void main() {
+  gl_FragColor.rgb = intensity;
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Phong lighting model, Toon shading -->
+
+<script id="vs3" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition;
+uniform vec3 lightPosition_2;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 lightDirectionW_2;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW = lightPosition - positionW.xyz;
+  lightDirectionW_2 = lightPosition_2 - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+  texCoordI = texCoord;
+
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs3" type="text/glsl">
+precision highp float;
+
+float celband = 4.0;
+float toonFactor;
+float toonFactor_2;
+float intensy;
+float intensy_2;
+
+uniform vec3 color;
+uniform vec3 lightIntensity;
+uniform vec3 lightIntensity_2;
+uniform float textureScale;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 lightDirectionW_2;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+float toonDiffuse(vec3 normal, vec3 light) {
+	float diffuse = max(0.0, dot(normal, light));
+	return floor(diffuse*celband)/celband;
+}
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 intensity, vec3 reflectivity) {
+  return 0.1 * reflectivity * intensity +
+         0.6 * reflectivity * intensity * toonDiffuse(normal, light);
+}
+
+float toonReflect(vec3 eye, vec3 normal, vec3 light) {
+	float reflect = pow(max(0.0, dot(reflect(-eye, normal), light)), 10.0);
+	if(reflect > 0.5)
+		return 1.0;
+	else
+		return 0.0;
+}
+
+vec3 phong(vec3 normal, vec3 eye, vec3 light, 
+           vec3 intensity, vec3 reflectivity) {
+  return lambert(normal, light, intensity, reflectivity) + 0.3 * intensity *
+		toonReflect(eye, normal, light);
+}
+
+
+void main() {
+ /* http://www.lighthouse3d.com/tutorials/glsl-tutorial/toon-shading-version-iii/ */
+ /* http://www.informatik-forum.at/showthread.php?91347-Toon-shader */
+	intensy = dot(normalize(lightDirectionW), normalW);
+	intensy_2 = dot(normalize(lightDirectionW_2), normalW);
+	
+	intensy = floor(intensy * celband) / celband;
+	intensy_2 = floor(intensy_2 * celband) / celband;
+
+    gl_FragColor.rgb = phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW), 
+    lightIntensity, color * intensy );
+	
+	gl_FragColor.rgb += phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW_2), 
+    lightIntensity_2, color * intensy_2 );
+	
+    gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Phong lighting model, Phong shading with texture -->
+
+<script id="vs4" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW = lightPosition - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+
+  texCoordI = texCoord;
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs4" type="text/glsl">
+precision highp float;
+
+uniform vec3 lightIntensity;
+
+uniform sampler2D earth;
+uniform samplerCube skybox;
+uniform sampler2D kissen_nrm;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 intensity, vec3 reflectivity) {
+  return 0.1 * reflectivity * intensity +
+         0.6 * reflectivity * intensity * max(0.0, dot(normal, light));
+}
+
+vec3 phong(vec3 normal, vec3 eye, vec3 light, 
+           vec3 intensity, vec3 reflectivity) {
+  return lambert(normal, light, intensity, reflectivity) +
+         0.3 * intensity * pow(max(0.0, dot(reflect(-eye, normal), 
+                                      light)), 10.0);
+}
+
+void main() {
+	
+  /*vec3 mapnorm = texture2D(kissen_nrm, texCoordI).xyz;
+	mapnorm.y = 1.0 - mapnorm.y;
+	mapnorm = 2.0 * mapnorm - vec3(1.0, 1.0, 1.0);
+	mapnorm.z *= 10.0;
+*/
+
+// mirror y axis to correct texture orientation
+  vec3 newEye = eyeDirectionW;
+  newEye.y *= -1.0;
+  vec4 frag  = textureCube(skybox, normalize(reflect(newEye, normalW)));
+  vec3 color = vec3(frag[0],frag[1],frag[2]);
+  
+gl_FragColor.rgb = phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW), 
+    lightIntensity, color);
+
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Phong lighting model, Phong shading -->
+
+<script id="vs5" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition;
+uniform vec3 lightPosition_2;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 lightDirectionW_2;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW = lightPosition - positionW.xyz;
+  lightDirectionW_2 = lightPosition_2 - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+  texCoordI = texCoord;
+
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs5" type="text/glsl">
+precision highp float;
+/* celband defines how many shades are visible */
+float celband = 4.0;
+float toonFactor;
+float toonFactor_2;
+float intensy;
+float intensy_2;
+
+uniform vec3 color;
+uniform vec3 lightIntensity;
+uniform vec3 lightIntensity_2;
+uniform float textureScale;
+uniform vec3 textureColor;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 lightDirectionW_2;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+float toonDiffuse(vec3 normal, vec3 light) {
+	float diffuse = max(0.0, dot(normal, light));
+	return floor(diffuse*celband)/celband;
+}
+
+vec3 lambert(vec3 normal, vec3 light, 
+             vec3 intensity, vec3 reflectivity) {
+  return 0.1 * reflectivity * intensity +
+         0.6 * reflectivity * intensity * toonDiffuse(normal, light);
+}
+
+float toonReflect(vec3 eye, vec3 normal, vec3 light) {
+	float reflect = pow(max(0.0, dot(reflect(-eye, normal), light)), 10.0);
+	if(reflect > 0.5)
+		return 1.0;
+	else
+		return 0.0;
+}
+
+vec3 phong(vec3 normal, vec3 eye, vec3 light, 
+           vec3 intensity, vec3 reflectivity) {
+  return lambert(normal, light, intensity, reflectivity) + 0.3 * intensity *
+		toonReflect(eye, normal, light);
+}
+
+
+void main() {
+ /* http://www.lighthouse3d.com/tutorials/glsl-tutorial/toon-shading-version-iii/ */
+ /* http://www.informatik-forum.at/showthread.php?91347-Toon-shader */
+  intensy = dot(normalize(lightDirectionW), normalW);
+  intensy_2 = dot(normalize(lightDirectionW_2), normalW);
+	
+  intensy = floor(intensy * celband) / celband;
+  intensy_2 = floor(intensy_2 * celband) / celband;
+  /* add first light color to fragment color */
+  gl_FragColor.rgb = phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW), 
+    lightIntensity, color * intensy );
+  /* add second light color to fragment color */
+  gl_FragColor.rgb += phong(
+    normalize(normalW), 
+    normalize(eyeDirectionW), 
+    normalize(lightDirectionW_2), 
+    lightIntensity_2, color * intensy_2 );
+	
+  /* http://people.freedesktop.org/~idr/OpenGL_tutorials/03-fragment-intro.html */
+  vec2 pos = mod(texCoordI * textureScale, vec2(75.0)) - vec2(50.0);
+  float dist_squared = dot(pos, pos);
+  
+  gl_FragColor += mix(vec4(textureColor, 1.0),
+                      vec4(.20, .20, .40, 1.0),
+                     smoothstep(380.25, 420.25, dist_squared));
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+<!-- Shader for Skybox -->
+
+<script id="vs6" type="text/glsl">
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
+
+attribute vec4 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+
+varying vec3 normalW;
+varying vec3 lightDirectionW;
+varying vec3 eyeDirectionW;
+varying vec2 texCoordI;
+
+void main() {
+  vec4 positionW = model * position;
+  normalW = (model * vec4(normal, 0.0)).xyz;
+  lightDirectionW = lightPosition - positionW.xyz;
+  eyeDirectionW = eyePosition - positionW.xyz;
+
+  texCoordI = texCoord;
+  gl_Position = projection * view * positionW;
+}
+</script>
+
+<script id="fs6" type="text/glsl">
+precision highp float;
+
+uniform samplerCube skybox;
+
+varying vec3 eyeDirectionW;
+
+void main() {
+
+  // mirror y axis to correct texture orientation
+  vec3 newEye = eyeDirectionW;
+  newEye.y *= -1.0;
+
+  gl_FragColor.rgb = textureCube(skybox, normalize(newEye)).xyz;
+  gl_FragColor.a = 1.0;
+}
+</script>
+
+
+</body></html>
