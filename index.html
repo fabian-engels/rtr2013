@@ -1,115 +1,104 @@
 <!DOCTYPE html>
-<html lang="de"><head>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-    <title>Realtime Rendering - Abgaben</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+<html lang="de">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+        <title>Realtime Rendering - Abgaben</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+        <style type="text/css">
+        html,
+        body {
+            height: 100%;
+        }
+        #wrap {
+            min-height: 100%;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto .60px;
+        }
+        #push,
+        #footer {
+            height: 60px;
+        }
+        #footer {
+            background-color: #f5f5f5;
+        }
+        </style>
+    </head>
+    <body>
+        <script src="./js/jquery.js"></script>
+        <script src="./js/bootstrap.js"></script>
+        <div id="wrap">
+            <div class="container">
+                <div class="page-header">
+                    <h1>Realtime Rendering<br> <small>Abgaben SS 2013</small>
+                    </h1>
+                </div>
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <a class="brand" href="#">Aufgaben</a>
+                        <ul class="nav">
+                            <li><a href="./aufgabe02/index.html">WebGL Tesselation</a></li>
+                            <li><a href="./aufgabe03/index.html">Simple Lighting</a></li>
+                            <li><a href="./aufgabe04/index.html">Environment-Mapping</a></li>
+                            <li><a href="./../aufgabe05/index.html">Multipass Rendering</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="hero-unit">
+                    <h2>Willkommen auf der Abgaben Seite</h2><h4>von Fabian Engels und Sven H&ouml;che im Kurs Real-Time Rendering</h4>
+                    <ul class="thumbnails">
+                        <li class="span4">
+                            <div class="thumbnail">
+                                <img src="./img/aufgabe02.png" alt="">
+                                <h3>WebGL Tesselation</h3>
+                                <a href="./aufgabe02/index.html" >
+                                <p>Get more information</p>
+                                </a>
+                            </div>
+                            <li class="span4">
+                                <div class="thumbnail">
+                                    <img src="./img/aufgabe03.png" alt="">
+                                    <h3>Simple Lighting</h3>
+                                    <a href="./aufgabe03/index.html" >
+                                    <p>Get more information</p>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="span4">
+                                <div class="thumbnail">
+                                    <img src="./img/aufgabe04.png" alt="">
+                                    <h3>Environment-Mapping</h3>
+                                    <a href="./aufgabe04/index.html" >
+                                    <p>Get more information</p>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="span4">
+                                <div class="thumbnail">
+                                    <img src="./img/aufgabe05.png" alt="">
+                                    <h3>Motion Blur</h3>
+                                    <a href="./aufgabe05/index.html" >
+                                    <p>Get more information</p>
+                                    </a>
+                                </div>
+                            </li>
 
-<style type="text/css">
-  html,
-  body {
-    height: 100%;
-  }
-
-  #wrap {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-    margin: 0 auto .60px;
-  }
-  #push,
-  #footer {
-    height: 60px;
-  }
-  #footer {
-    background-color: #f5f5f5;
-  }
-</style>
-</head>
-<body>
-<script src="./js/jquery.js"></script>
-<script src="./js/bootstrap.js"></script>
-<div id="wrap">
-<div class="container">
-
-<div class="page-header">
-  <h1>Realtime Rendering<br> <small>Abgaben SS 2013</small>
-  </h1>
-</div>
-<div class="navbar">
-  <div class="navbar-inner">
-    <a class="brand" href="#">Aufgaben</a>
-    <ul class="nav">
-      <li><a href="./aufgabe02/index.html">WebGL Tesselation</a></li>
-      <li><a href="./aufgabe03/index.html">Simple Lighting</a></li>
-      <li><a href="./aufgabe04/index.html">Environment-Mapping</a></li>
-      <li><a href="./../aufgabe05/index.html">Multipass Rendering</a></li>
-    </ul>
-  </div>
-</div>
-
- <div class="hero-unit"> 
-<h2>Willkommen auf der Abgaben Seite</h2><h4>von Fabian Engels und Sven H&ouml;che im Kurs Real-Time Rendering</h4>
-
-<ul class="thumbnails">
-  <li class="span4">
-    <div class="thumbnail">
-      <img src="./img/aufgabe02.png" alt="">
-    <h3>WebGL Tesselation</h3>
-    <a href="./aufgabe02/index.html" >
-    <p>Get more information</p>
-    </a>
-  </div>
-
-    <li class="span4">
-    <div class="thumbnail">
-      <img src="./img/aufgabe03.png" alt="">
-    <h3>Simple Lighting</h3>
-    <a href="./aufgabe03/index.html" >
-    <p>Get more information</p>
-  </a>
-  </div>
-  </li>
-
-  <li class="span4">
-    <div class="thumbnail">
-      <img src="./img/aufgabe04.png" alt="">
-    <h3>Environment-Mapping</h3>
-    <a href="./aufgabe04/index.html" >
-    <p>Get more information</p>
-  </a>
-  </div>
-  </li>
-
-   <li class="span4">
-    <div class="thumbnail">
-      <img src="./img/aufgabe05.png" alt="">
-    <h3>Motion Blur</h3>
-    <a href="./aufgabe05/index.html" >
-    <p>Get more information</p>
-  </a>
-  </div>
-  </li>
-  
-</ul>
-</div>  
-
-
-</div>
-
-<div id="push"></div>
-</div>
-
- <div id="footer">
-   <div class="container">
-	 <p class="muted credit">Website made by<br/>
-	   Fabian Engels s797352
-	   <a href="mailto:engels.fabian@gmail.com">engels.fabian@gmail.com</a><br>
-	   Sven H&ouml;che s797948
-	   <a href="mailto:sven.hoeche@gmx.de">sven.hoeche@gmx.de
-    </p>
-      </div>
-  </div>
-
-</body></html>
+                        </ul>
+                    </div>
+                </div>
+                <div id="push"></div>
+            </div>
+            <div id="footer">
+                <div class="container">
+                    <p class="muted credit">Website made by<br/>
+                    Fabian Engels s797352
+                    <a href="mailto:engels.fabian@gmail.com">engels.fabian@gmail.com</a><br>
+                    Sven H&ouml;che s797948
+                    <a href="mailto:sven.hoeche@gmx.de">sven.hoeche@gmx.de
+                    </p>
+                </div>
+            </div>
+        </body>
+    </html>
